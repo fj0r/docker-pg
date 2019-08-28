@@ -122,6 +122,7 @@ if [ "$1" = 'postgres' ]; then
 		} >> "$PGDATA/pg_hba.conf"
 
 		###
+		sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${PG_SHARED_BUFFERS:-128MB}\2/" "$PGDATA/postgresql.conf"
 		{
 			echo
 			echo "wal_level = logical"
