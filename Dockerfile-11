@@ -73,7 +73,6 @@ RUN set -ex \
 		zlib-dev \
 		icu-dev \
 		postgresql-dev \
-		python3-dev \
 		git \
 	\
 	&& pip --no-cache-dir install \

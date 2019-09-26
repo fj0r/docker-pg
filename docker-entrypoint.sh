@@ -87,14 +87,10 @@ if [ "$1" = 'postgres' ]; then
 
 			if [ "${#POSTGRES_PASSWORD}" -ge 100 ]; then
 				cat >&2 <<-'EOWARN'
-
 					WARNING: The supplied POSTGRES_PASSWORD is 100+ characters.
-
 					  This will not work if used via PGPASSWORD with "psql".
-
 					  https://www.postgresql.org/message-id/flat/E1Rqxp2-0004Qt-PL%40wrigleys.postgresql.org (BUG #6412)
 					  https://github.com/docker-library/postgres/issues/507
-
 				EOWARN
 			fi
 		else
@@ -107,7 +103,6 @@ if [ "$1" = 'postgres' ]; then
 				         Docker's default configuration, this is
 				         effectively any other container on the same
 				         system.
-
 				         Use "-e POSTGRES_PASSWORD=password" to set
 				         it in "docker run".
 				****************************************************
