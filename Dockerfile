@@ -24,16 +24,17 @@ RUN mkdir /docker-entrypoint-initdb.d
 ENV PG_MAJOR 12
 ENV PG_VERSION 12rc1
 ENV PG_SHA256 40facd3280d8565f37139d2c5df2b94fe68a064c5d2784f74fceae24820543f3
+ARG pg_url=https://ftp.postgresql.org/pub/source/v$PG_VERSION/postgresql-$PG_VERSION.tar.bz2
 
 RUN set -ex \
-	#&& sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories \
+	&& sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
 	\
 	&& apk add --no-cache --virtual .fetch-deps \
 		ca-certificates \
 		openssl \
 		tar \
 	\
-	&& wget -O postgresql.tar.bz2 "https://ftp.postgresql.org/pub/source/v$PG_VERSION/postgresql-$PG_VERSION.tar.bz2" \
+	&& wget -O postgresql.tar.bz2 "$pg_url" \
 	&& echo "$PG_SHA256 *postgresql.tar.bz2" | sha256sum -c - \
 	&& mkdir -p /usr/src/postgresql \
 	&& tar \
@@ -146,8 +147,8 @@ RUN set -ex \
 	\
 	&& cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 	&& echo "Asia/Shanghai" > /etc/timezone \
+	&& cd / \
 	\
-    #&& cd / \
 	#&& wget -O- https://github.com/postgrespro/rum/archive/1.3.1.tar.gz | tar zxf - \
     #&& mv rum-1.3.1 rum \
 	#&& cd rum \
@@ -161,7 +162,7 @@ RUN set -ex \
 	&& cd wal2json \
 	&& USE_PGXS=1 make \
 	&& USE_PGXS=1 make install \
-	#&& cd / && [[ -d wal2json ]] && rm -rf wal2json \
+	&& cd / && [[ -d wal2json ]] && rm -rf wal2json \
     \
 	#&& wget -O- https://github.com/timescale/timescaledb/archive/1.3.0.tar.gz | tar zxf - \
     #&& mv timescaledb-1.3.0 timescaledb \
@@ -172,7 +173,6 @@ RUN set -ex \
 	#&& cd / && [[ -d timescaledb ]] && rm -rf timescaledb \
 	\
 	&& apk del .fetch-deps .build-deps \
-	&& cd / \
 	&& rm -rf \
 		/usr/src/postgresql \
 		/usr/local/share/doc \
