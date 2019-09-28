@@ -1,0 +1,59 @@
+# vim:set ft=dockerfile:
+FROM python:3.7.4-alpine3.10
+
+# alpine includes "postgres" user/group in base install
+#   /etc/passwd:22:postgres:x:70:70::/var/lib/postgresql:/bin/sh
+#   /etc/group:34:postgres:x:70:
+# the home directory for the postgres user, however, is not created by default
+# see https://github.com/docker-library/postgres/issues/274
+RUN set -ex; \
+	postgresHome="$(getent passwd postgres)"; \
+	postgresHome="$(echo "$postgresHome" | cut -d: -f6)"; \
+	[ "$postgresHome" = '/var/lib/postgresql' ]; \
+	mkdir -p "$postgresHome"; \
+	chown -R postgres:postgres "$postgresHome"
+
+# su-exec (gosu-compatible) is installed further down
+
+# make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
+# alpine doesn't require explicit locale-file generation
+ENV LANG zh_CN.utf8
+
+
+RUN set -ex \
+	&& sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
+	\
+	&& apk add --no-cache --virtual .build-deps \
+        unzip \
+		bison \
+		coreutils \
+		dpkg-dev dpkg \
+		flex \
+		gcc \
+        g++ \
+		clang \
+		llvm-dev \
+		llvm \
+#		krb5-dev \
+		libc-dev \
+		libedit-dev \
+		libxml2-dev \
+		libxslt-dev \
+		linux-headers \
+		make \
+        cmake \
+#		openldap-dev \
+		openssl-dev \
+# configure: error: prove not found
+		perl-utils \
+# configure: error: Perl module IPC::Run is required to run TAP tests
+		perl-ipc-run \
+#		perl-dev \
+#		python-dev \
+		python3-dev \
+#		tcl-dev \
+		util-linux-dev \
+		zlib-dev \
+		icu-dev \
+		postgresql-dev \
+		git
