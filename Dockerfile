@@ -149,14 +149,13 @@ RUN set -ex \
 	&& echo "Asia/Shanghai" > /etc/timezone \
 	&& cd / \
 	\
-	#&& wget -O- https://github.com/postgrespro/rum/archive/1.3.1.tar.gz | tar zxf - \
-    #&& mv rum-1.3.1 rum \
-	#&& cd rum \
-	#&& make USE_PGXS=1 \
-	#&& make USE_PGXS=1 install \
-	## && make USE_PGXS=1 installcheck \
-	## && psql DB -c "CREATE EXTENSION rum;" \
-	#&& cd / && [[ -d rum ]] && rm -rf rum \
+	&& git clone https://github.com/postgrespro/rum.git \
+	&& cd rum \
+	&& make USE_PGXS=1 \
+	&& make USE_PGXS=1 install \
+	# && make USE_PGXS=1 installcheck \
+	# && psql DB -c "CREATE EXTENSION rum;" \
+	&& cd / && [[ -d rum ]] && rm -rf rum \
     \
 	&& git clone https://github.com/eulerto/wal2json.git \
 	&& cd wal2json \
