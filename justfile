@@ -8,9 +8,10 @@ img:
         -f Dockerfile-new \
         --build-arg pg_url=http://172.178.1.204:2015/postgresql.tar.bz2
 
-i:
+build:
     docker build . -t pg \
         --build-arg pg_url=http://172.178.1.204:2015/postgresql.tar.bz2
 
-# pg: 339M 380M
-# pip numpy-1.17.2  py-numpy 1.16.4
+test:
+    docker run --rm -v $(pwd)/test.sql:/docker-entrypoint-initdb.d/test.sql pg
+
