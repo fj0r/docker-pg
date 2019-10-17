@@ -163,13 +163,14 @@ RUN set -ex \
 	&& USE_PGXS=1 make install \
 	&& cd / && [[ -d wal2json ]] && rm -rf wal2json \
     \
-	#&& wget -O- https://github.com/timescale/timescaledb/archive/1.3.0.tar.gz | tar zxf - \
-    #&& mv timescaledb-1.3.0 timescaledb \
-	#&& cd timescaledb \
-	#&& ./bootstrap \
-	#&& cd build && make \
-	#&& make install \
-	#&& cd / && [[ -d timescaledb ]] && rm -rf timescaledb \
+	&& timescaledb_version=1.4.2 \
+	&& wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
+    && mv timescaledb-${timescaledb_version} timescaledb \
+	&& cd timescaledb \
+	&& ./bootstrap \
+	&& cd build && make \
+	&& make install \
+	&& cd / && [[ -d timescaledb ]] && rm -rf timescaledb \
 	\
 	&& apk del .fetch-deps .build-deps \
 	&& rm -rf \
