@@ -163,7 +163,7 @@ RUN set -ex \
 	&& USE_PGXS=1 make install \
 	&& cd / && [[ -d wal2json ]] && rm -rf wal2json \
     \
-	&& timescaledb_version=1.4.2 \
+	&& timescaledb_version=1.5.0 \
 	&& wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
     && mv timescaledb-${timescaledb_version} timescaledb \
 	&& cd timescaledb \
