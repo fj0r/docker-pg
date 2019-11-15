@@ -227,6 +227,7 @@ docker_temp_server_stop() {
 }
 
 customize_config() {
+	echo 'Customize PostgreSQL...'
 	sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${PG_SHARED_BUFFERS:-128MB}\2/" "$PGDATA/postgresql.conf"
 	{
 		echo
@@ -269,9 +270,6 @@ _main() {
 			unset PGPASSWORD
 
 			customize_config
-			echo
-			echo 'Customize PostgreSQL process complete.'
-			echo
 
 			echo
 			echo 'PostgreSQL init process complete; ready for start up.'
