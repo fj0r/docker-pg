@@ -226,6 +226,16 @@ docker_temp_server_stop() {
 	pg_ctl -D "$PGDATA" -m fast -w stop
 }
 
+customize_config() {
+	sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${PG_SHARED_BUFFERS:-128MB}\2/" "$PGDATA/postgresql.conf"
+	{
+		echo
+		echo "wal_level = logical"
+		echo "shared_preload_libraries = 'pg_stat_statements'  #,timescaledb,pg_jieba.so"
+		#echo "jit_provider = 'llvmjit'"
+	} >> "$PGDATA/postgresql.conf"
+}
+
 _main() {
 	# if first arg looks like a flag, assume we want to run postgres server
 	if [ "${1:0:1}" = '-' ]; then
@@ -257,6 +267,11 @@ _main() {
 
 			docker_temp_server_stop
 			unset PGPASSWORD
+
+			customize_config
+			echo
+			echo 'Customize PostgreSQL process complete.'
+			echo
 
 			echo
 			echo 'PostgreSQL init process complete; ready for start up.'
