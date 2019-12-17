@@ -30,12 +30,14 @@ This is an environment variable that is not Docker specific. Because the variabl
 
 ## CUSTOMIZE ENTRYPOINT
 ``` bash
-		###
-		sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${PG_SHARED_BUFFERS:-128MB}\2/" "$PGDATA/postgresql.conf"
-		{
-			echo
-			echo "wal_level = logical"
-			echo "shared_preload_libraries = 'pg_stat_statements'  #,timescaledb,pg_jieba.so"
-			#echo "jit_provider = 'llvmjit'"
-		} >> "$PGDATA/postgresql.conf"
+customize_config() {
+	echo 'Customize PostgreSQL...'
+	sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${PG_SHARED_BUFFERS:-128MB}\2/" "$PGDATA/postgresql.conf"
+	{
+		echo
+		echo "wal_level = logical"
+		echo "shared_preload_libraries = 'pg_stat_statements'  #,timescaledb,pg_jieba.so"
+		#echo "jit_provider = 'llvmjit'"
+	} >> "$PGDATA/postgresql.conf"
+}
 ```

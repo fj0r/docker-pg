@@ -51,10 +51,7 @@ RUN set -ex \
 		dpkg-dev dpkg \
 		flex \
 		gcc \
-        g++ \
-		clang \
-		llvm-dev \
-		llvm \
+		llvm8-dev clang g++ \
 #		krb5-dev \
 		libc-dev \
 		libedit-dev \

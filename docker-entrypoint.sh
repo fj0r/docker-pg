@@ -32,7 +32,7 @@ _is_sourced() {
 		&& [ "${FUNCNAME[1]}" = 'source' ]
 }
 
-# used to create initial posgres directories and if run as root, ensure ownership to the "postgres" user
+# used to create initial postgres directories and if run as root, ensure ownership to the "postgres" user
 docker_create_db_directories() {
 	local user; user="$(id -u)"
 
@@ -212,11 +212,14 @@ docker_temp_server_start() {
 	if [ "$1" = 'postgres' ]; then
 		shift
 	fi
+
 	# internal start of server in order to allow setup using psql client
-	# does not listen on external TCP/IP and waits until start finishes (can be overridden via args)
+	# does not listen on external TCP/IP and waits until start finishes
+	set -- "$@" -c listen_addresses='' -p "${PGPORT:-5432}"
+
 	PGUSER="${PGUSER:-$POSTGRES_USER}" \
 	pg_ctl -D "$PGDATA" \
-		-o "-c listen_addresses='' $([ "$#" -gt 0 ] && printf '%q ' "$@")" \
+		-o "$(printf '%q ' "$@")" \
 		-w start
 }
 
@@ -224,6 +227,23 @@ docker_temp_server_start() {
 docker_temp_server_stop() {
 	PGUSER="${PGUSER:-postgres}" \
 	pg_ctl -D "$PGDATA" -m fast -w stop
+}
+
+# check arguments for an option that would cause postgres to stop
+# return true if there is one
+_pg_want_help() {
+	local arg
+	for arg; do
+		case "$arg" in
+			# postgres --help | grep 'then exit'
+			# leaving out -C on purpose since it always fails and is unhelpful:
+			# postgres: could not access the server configuration file "/var/lib/postgresql/data/postgresql.conf": No such file or directory
+			-'?'|--help|--describe-config|-V|--version)
+				return 0
+				;;
+		esac
+	done
+	return 1
 }
 
 customize_config() {
@@ -243,7 +263,7 @@ _main() {
 		set -- postgres "$@"
 	fi
 
-	if [ "$1" = 'postgres' ]; then
+	if [ "$1" = 'postgres' ] && ! _pg_want_help "$@"; then
 		docker_setup_env
 		# setup data directories and permissions (when run as root)
 		docker_create_db_directories
