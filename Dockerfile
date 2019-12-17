@@ -170,7 +170,7 @@ RUN set -ex \
 	#&& cd / && [[ -d timescaledb ]] && rm -rf timescaledb \
 	\
 	git clone https://github.com/jaiminpan/pg_jieba \
-  	&& cd /pg_jieba \
+  	&& cd pg_jieba \
   	&& git submodule update --init --recursive  \
 	&& mkdir build \
 	&& cd build \
