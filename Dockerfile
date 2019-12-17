@@ -169,7 +169,7 @@ RUN set -ex \
 	#&& make install \
 	#&& cd / && [[ -d timescaledb ]] && rm -rf timescaledb \
 	\
-	git clone https://github.com/jaiminpan/pg_jieba \
+	&& git clone https://github.com/jaiminpan/pg_jieba \
   	&& cd pg_jieba \
   	&& git submodule update --init --recursive  \
 	&& mkdir build \
