@@ -169,6 +169,16 @@ RUN set -ex \
 	#&& make install \
 	#&& cd / && [[ -d timescaledb ]] && rm -rf timescaledb \
 	\
+	git clone https://github.com/jaiminpan/pg_jieba \
+  	&& cd /pg_jieba \
+  	&& git submodule update --init --recursive  \
+	&& mkdir build \
+	&& cd build \
+	&& cmake .. \
+	&& make \
+	&& make install \
+	&& cd / && [[ -d pg_jieba ]] && rm -rf pg_jieba \
+	\
 	&& apk del .fetch-deps .build-deps \
 	&& rm -rf \
 		/usr/src/postgresql \
