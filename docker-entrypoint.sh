@@ -252,6 +252,7 @@ customize_config() {
 	{
 		echo
 		echo "wal_level = logical"
+		echo "max_replication_slots = 10"
 		echo "shared_preload_libraries = 'pg_stat_statements,pg_jieba.so'  #,timescaledb,pg_jieba.so"
 		#echo "jit_provider = 'llvmjit'"
 	} >> "$PGDATA/postgresql.conf"

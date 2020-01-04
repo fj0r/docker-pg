@@ -7,12 +7,7 @@ FROM python:3.8.1-alpine3.11
 # the home directory for the postgres user, however, is not created by default
 # see https://github.com/docker-library/postgres/issues/274
 RUN set -ex; \
-	echo 'postgres:x:70:70::/var/lib/postgresql:/bin/sh' >> /etc/passwd; \
-	postgresHome="$(getent passwd postgres)"; \
-	postgresHome="$(echo "$postgresHome" | cut -d: -f6)"; \
-	[ "$postgresHome" = '/var/lib/postgresql' ]; \
-	mkdir -p "$postgresHome"; \
-	chown -R postgres:postgres "$postgresHome"
+	adduser -h /var/lib/postgresql -s /bin/sh -u 70 -D -g '' postgres
 
 # su-exec (gosu-compatible) is installed further down
 
