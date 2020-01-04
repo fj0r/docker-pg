@@ -198,7 +198,7 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 5432
 CMD ["postgres"]
 
-ENV PGC_SHARED_BUFFERS=
+
 ENV PGC_WAL_LEVEL=logical
 ENV PGC_MAX_REPLICATION_SLOTS=10
 ENV PGC_SHARED_PRELOAD_LIBRARIES=pg_stat_statements,pg_jieba.so
