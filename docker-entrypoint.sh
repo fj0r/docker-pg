@@ -249,15 +249,16 @@ _pg_want_help() {
 customize_config() {
 	echo 'Customize PostgreSQL...'
 
-	local mod_args=""
+	local sed_cmd="sed -i \"$PGDATA/postgresql.conf\""
 
 	for i in "${!PGC_@}"; do
 		local k=$(echo ${i:4} | tr '[:upper:]' '[:lower:]')
 		local v=$(eval "echo \"\$$i\"")
-		echo "set $k = $v"
-		mod_args+="-e \"s/.*\(${k}\s*=\s*\).*\(\s*.#\) /\1${v}\2/\""
+		echo "  set $k = $v"
+		sed_cmd+=" -e \"s/.*\(${k}\s*=\s*\).*\(\s*.#\) /\1${v}\2/\""
 	done
-	sed -i "$PGDATA/postgresql.conf" $mod_args
+	echo "with cmd: $sed_cmd"
+	eval $sed_cmd
 }
 
 _main() {
