@@ -249,16 +249,15 @@ _pg_want_help() {
 customize_config() {
 	echo 'Customize PostgreSQL...'
 
-	local shared_buffers=${PGC_SHARED_BUFFERS:-128MB}
-	echo "set shared_buffers = ${shared_buffers}"
-	sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${shared_buffers}\2/" "$PGDATA/postgresql.conf"
+	local mod_args=""
 
 	for i in "${!PGC_@}"; do
 		local k=$(echo ${i:4} | tr '[:upper:]' '[:lower:]')
 		local v=$(eval "echo \"\$$i\"")
 		echo "set $k = $v"
-		echo "$k = $v" >> "$PGDATA/postgresql.conf"
+		mod_args+="-e \"s/.*\(${k}\s*=\s*\).*\(\s*.#\) /\1${v}\2/\""
 	done
+	sed -i "$PGDATA/postgresql.conf" $mod_args
 }
 
 _main() {
