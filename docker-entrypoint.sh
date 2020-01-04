@@ -249,26 +249,16 @@ _pg_want_help() {
 customize_config() {
 	echo 'Customize PostgreSQL...'
 
-	local shared_buffers=${PG_SHARED_BUFFERS:-128MB}
+	local shared_buffers=${PGC_SHARED_BUFFERS:-128MB}
 	echo "set shared_buffers = ${shared_buffers}"
 	sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${shared_buffers}\2/" "$PGDATA/postgresql.conf"
 
-	local wal_level=${PG_WAL_LEVEL:-logical}
-	echo "set wal_level = ${wal_level}"
-
-	local max_replication_slots=${PG_MAX_REPLICATION_SLOTS:-10}
-	echo "set max_replication_slots = ${max_replication_slots}"
-
-	local shared_preload_libraries=${PG_SHARED_PRELOAD_LIBRARIES:-pg_stat_statements,pg_jieba.so}
-	echo "set shared_preload_libraries = ${shared_preload_libraries}"
-
-	{
-		echo
-		echo "wal_level = ${wal_level}"
-		echo "max_replication_slots = ${max_replication_slots}"
-		echo "shared_preload_libraries = '${shared_preload_libraries}'  #timescaledb"
-		#echo "jit_provider = 'llvmjit'"
-	} >> "$PGDATA/postgresql.conf"
+	for i in "${!PGC_@}"; do
+		local k=$(echo ${i:4} | tr '[:upper:]' '[:lower:]')
+		local v=$(eval "echo \"\$$i\"")
+		echo "set $k = $v"
+		echo "$k = $v" >> "$PGDATA/postgresql.conf"
+	done
 }
 
 _main() {
