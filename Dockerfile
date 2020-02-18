@@ -5,7 +5,7 @@ FROM python:3.8.1-alpine3.11
 # https://git.alpinelinux.org/aports/tree/main/postgresql/postgresql.pre-install?h=3.11-stable
 RUN set -eux; \
 	addgroup -g 70 -S postgres; \
-	adduser -u 70 -S -D -G postgres -H -h /var/lib/postgresql postgres; \
+	adduser -u 70 -S -D -G postgres -H -h /var/lib/postgresql -s /bin/bash postgres; \
 	mkdir -p /var/lib/postgresql; \
 	chown -R postgres:postgres /var/lib/postgresql
 
@@ -20,17 +20,15 @@ RUN mkdir /docker-entrypoint-initdb.d
 ENV PG_MAJOR 12
 ENV PG_VERSION 12.2
 ENV PG_SHA256 ad1dcc4c4fc500786b745635a9e1eba950195ce20b8913f50345bb7d5369b5de
-ARG pg_url=https://ftp.postgresql.org/pub/source/v$PG_VERSION/postgresql-$PG_VERSION.tar.bz2
 
 RUN set -ex \
-	&& sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
 	\
 	&& apk add --no-cache --virtual .fetch-deps \
 		ca-certificates \
 		openssl \
 		tar \
 	\
-	&& wget -O postgresql.tar.bz2 "$pg_url" \
+	&& wget -O postgresql.tar.bz2 "https://ftp.postgresql.org/pub/source/v$PG_VERSION/postgresql-$PG_VERSION.tar.bz2" \
 	&& echo "$PG_SHA256 *postgresql.tar.bz2" | sha256sum -c - \
 	&& mkdir -p /usr/src/postgresql \
 	&& tar \
@@ -41,21 +39,21 @@ RUN set -ex \
 	&& rm postgresql.tar.bz2 \
 	\
 	&& apk add --no-cache --virtual .build-deps \
-        unzip \
 		bison \
+        cmake \
 		coreutils \
 		dpkg-dev dpkg \
 		flex \
 		gcc \
-		llvm9-dev clang g++ \
+		git \
 #		krb5-dev \
 		libc-dev \
 		libedit-dev \
 		libxml2-dev \
 		libxslt-dev \
 		linux-headers \
+		llvm9-dev clang g++ \
 		make \
-        cmake \
 #		openldap-dev \
 		openssl-dev \
 # configure: error: prove not found
@@ -63,14 +61,14 @@ RUN set -ex \
 # configure: error: Perl module IPC::Run is required to run TAP tests
 		perl-ipc-run \
 #		perl-dev \
+		postgresql-dev \
 #		python-dev \
 		python3-dev \
 #		tcl-dev \
 		util-linux-dev \
+        unzip \
 		zlib-dev \
 		icu-dev \
-		postgresql-dev \
-		git \
 	\
 	&& pip --no-cache-dir install \
 		git+https://github.com/dbcli/pgcli.git@master \
@@ -113,13 +111,13 @@ RUN set -ex \
 #		--with-ldap \
 #		--with-tcl \
 #		--with-perl \
-		--with-llvm \
 		--with-python \
 #		--with-pam \
 		--with-openssl \
 		--with-libxml \
 		--with-libxslt \
 		--with-icu \
+		--with-llvm \
 	&& make -j "$(nproc)" world \
 	&& make install-world \
 	&& make -C contrib install \
