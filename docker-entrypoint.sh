@@ -268,7 +268,7 @@ customize_config() {
 		local k=$(echo ${i:4} | tr '[:upper:]' '[:lower:]')
 		local v=$(eval "echo \"\$$i\"")
 		echo "  set $k = $v"
-		sed_cmd+=" -e \"s/.*\(${k}\s*=\s*\).*\(\s*.#\) /\1${v}\2/\""
+		sed_cmd+=" -e \"s/.*\(${k}\s*=\s*\)\(.*\)/\1${v} ## \2/\""
 	done
 	echo "with cmd: $sed_cmd"
 	eval $sed_cmd
