@@ -1,0 +1,53 @@
+# vim:set ft=dockerfile:
+FROM postgres:12.2
+
+ENV TIMEZONE=Asia/Shanghai
+RUN set -eux \
+	; ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime \
+  	; echo "$TIMEZONE" > /etc/timezone \
+	; sed -i 's/\(.*\)\(security\|deb\).debian.org\(.*\)main/\1ftp.cn.debian.org\3main contrib non-free/g' /etc/apt/sources.list \
+	; apt-get update \
+	; apt-get install -y --no-install-recommends \
+		python3-pip postgresql-plpython3-12 postgresql-12-python3-multicorn \
+		git postgresql-server-dev-12 ca-certificates \
+		cmake wget build-essential \
+	; pip3 --no-cache-dir install \
+		git+https://github.com/dbcli/pgcli.git@master \
+		numpy requests pyyaml furl \
+		cachetools more-itertools PyParsing \
+	\
+	; builddir=/root \
+	; cd $builddir \
+	; git clone https://github.com/postgrespro/rum.git \
+	; cd rum \
+	; make USE_PGXS=1 \
+	; make USE_PGXS=1 install \
+	; cd $builddir && [[ -d rum ]] && rm -rf rum \
+	; git clone https://github.com/eulerto/wal2json.git \
+	; cd wal2json \
+	; USE_PGXS=1 make \
+	; USE_PGXS=1 make install \
+	; cd $builddir && [[ -d wal2json ]] && rm -rf wal2json \
+	; git clone https://github.com/jaiminpan/pg_jieba \
+  	; cd pg_jieba \
+  	; git submodule update --init --recursive  \
+	; mkdir build \
+	; cd build \
+	; cmake .. \
+	; make \
+	; make install \
+	; cd $builddir && [[ -d pg_jieba ]] && rm -rf pg_jieba \
+	\
+	; apt-get purge -y --auto-remove \
+		git postgresql-server-dev-12 ca-certificates \
+		cmake wget build-essential \
+	; apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+
+COPY docker-entrypoint-deb.sh /usr/local/bin/docker-entrypoint.sh
+RUN ln -sf usr/local/bin/docker-entrypoint.sh / # backwards compat
+
+ENV PGC_SHARED_BUFFERS=128MB
+ENV PGC_WAL_LEVEL=logical
+ENV PGC_MAX_REPLICATION_SLOTS=10
+#ENV PGC_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,pg_jieba.so'"
