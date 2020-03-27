@@ -13,7 +13,6 @@ RUN set -eux \
 		git postgresql-server-dev-12 ca-certificates \
 		cmake wget build-essential \
 	; pip3 --no-cache-dir install \
-		git+https://github.com/dbcli/pgcli.git@master \
 		numpy requests pyyaml furl \
 		cachetools more-itertools PyParsing \
 	\
