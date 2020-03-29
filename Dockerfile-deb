@@ -36,15 +36,15 @@ RUN set -eux \
 	; USE_PGXS=1 make \
 	; USE_PGXS=1 make install \
 	; cd $builddir && [[ -d wal2json ]] && rm -rf wal2json \
-	#; git clone https://github.com/jaiminpan/pg_jieba \
-  	#; cd pg_jieba \
-  	#; git submodule update --init --recursive  \
-	#; mkdir build \
-	#; cd build \
-	#; cmake .. \
-	#; make \
-	#; make install \
-	#; cd $builddir && [[ -d pg_jieba ]] && rm -rf pg_jieba \
+	; git clone https://github.com/jaiminpan/pg_jieba \
+  	; cd pg_jieba \
+  	; git submodule update --init --recursive  \
+	; mkdir build \
+	; cd build \
+	; cmake .. \
+	; make \
+	; make install \
+	; cd $builddir && [[ -d pg_jieba ]] && rm -rf pg_jieba \
 	\
 	; apt-get purge -y --auto-remove {BUILD_DEPS:-} \
 	; apt-get clean -y && rm -rf /var/lib/apt/lists/*
