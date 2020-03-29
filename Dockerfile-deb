@@ -1,6 +1,15 @@
 # vim:set ft=dockerfile:
 FROM postgres:12.2
 
+ARG BUILD_DEPS \
+	git \
+	cmake \
+	wget \
+	build-essential \
+	ca-certificates \
+	postgresql-server-dev-12 \
+	libpq-dev
+
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
 	; ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime \
@@ -10,8 +19,7 @@ RUN set -eux \
 	; apt-get install -y --no-install-recommends \
 		postgresql-plpython3-12 postgresql-12-python3-multicorn \
 		python3-pip python3-setuptools \
-		git postgresql-server-dev-12 ca-certificates \
-		cmake wget build-essential \
+		${BUILD_DEPS:-} \
 	; pip3 --no-cache-dir install \
 		numpy requests pyyaml furl \
 		cachetools more-itertools PyParsing \
@@ -38,9 +46,7 @@ RUN set -eux \
 	#; make install \
 	#; cd $builddir && [[ -d pg_jieba ]] && rm -rf pg_jieba \
 	\
-	; apt-get purge -y --auto-remove \
-		git postgresql-server-dev-12 ca-certificates \
-		cmake wget build-essential \
+	; apt-get purge -y --auto-remove {BUILD_DEPS:-} \
 	; apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 
