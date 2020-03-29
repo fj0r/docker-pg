@@ -1,7 +1,7 @@
 # vim:set ft=dockerfile:
 FROM postgres:12.2
 
-ARG BUILD_DEPS \
+ENV BUILD_DEPS \
 	git \
 	cmake \
 	wget \
