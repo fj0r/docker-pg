@@ -14,7 +14,6 @@ ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
 	; ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime \
   	; echo "$TIMEZONE" > /etc/timezone \
-	; sed -i 's/\(.*\)\(security\|deb\).debian.org\(.*\)main/\1ftp.cn.debian.org\3main contrib non-free/g' /etc/apt/sources.list \
 	; apt-get update \
 	; apt-get install -y --no-install-recommends \
 		postgresql-plpython3-12 postgresql-12-python3-multicorn \
