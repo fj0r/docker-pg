@@ -10,7 +10,7 @@ ENV BUILD_DEPS \
 	libpq-dev \
 	postgresql-server-dev-12
 
-ENV LANG zh_CN.utf8
+#ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
 	; ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime \
