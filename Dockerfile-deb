@@ -10,10 +10,15 @@ ENV BUILD_DEPS \
 	libpq-dev \
 	postgresql-server-dev-12
 
+ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
 	; ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime \
   	; echo "$TIMEZONE" > /etc/timezone \
+	; sed -i /etc/locale.gen \
+		-e 's/# \(en_US.UTF-8 UTF-8\)/\1/' \
+		-e 's/# \(zh_CN.UTF-8 UTF-8\)/\1/' \
+	; locale-gen \
 	; apt-get update \
 	; apt-get install -y --no-install-recommends \
 		postgresql-plpython3-12 postgresql-12-python3-multicorn \
@@ -54,7 +59,6 @@ RUN set -eux \
 COPY docker-entrypoint-deb.sh /usr/local/bin/docker-entrypoint.sh
 RUN ln -sf usr/local/bin/docker-entrypoint.sh / # backwards compat
 
-ENV LANG zh_CN.utf8
 ENV PGC_SHARED_BUFFERS=128MB
 ENV PGC_WAL_LEVEL=logical
 ENV PGC_MAX_REPLICATION_SLOTS=10
