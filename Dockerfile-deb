@@ -8,7 +8,7 @@ ENV BUILD_DEPS \
 	build-essential \
 	ca-certificates \
 	libpq-dev \
-	postgresql-server-dev-all
+	postgresql-server-dev-12
 
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
@@ -35,15 +35,16 @@ RUN set -eux \
 	; cd wal2json \
 	; USE_PGXS=1 make \
 	; USE_PGXS=1 make install \
-	#; cd $build_dir \
-	#; git clone https://github.com/jaiminpan/pg_jieba \
-  	#; cd pg_jieba \
-  	#; git submodule update --init --recursive  \
-	#; mkdir build \
-	#; cd build \
-	#; cmake .. \
-	#; make \
-	#; make install \
+	; cd $build_dir \
+	; git clone https://github.com/jaiminpan/pg_jieba \
+  	; cd pg_jieba \
+  	; git submodule update --init --recursive  \
+	; mkdir build \
+	; cd build \
+	; cmake .. \
+		-DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/12/server \
+	; make \
+	; make install \
 	; rm -rf $build_dir \
 	\
 	; apt-get purge -y --auto-remove ${BUILD_DEPS:-} \

@@ -15,3 +15,6 @@ build:
 test:
     docker run --rm -v $(pwd)/test.sql:/docker-entrypoint-initdb.d/test.sql pg
 
+stage:
+    docker build . -t pg-stage -f Dockerfile-stage
+
