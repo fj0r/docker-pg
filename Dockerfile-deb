@@ -31,15 +31,18 @@ RUN set -eux \
 	; build_dir=/root/build \
 	; mkdir -p $build_dir \
 	; cd $build_dir \
+	\
 	; git clone https://github.com/postgrespro/rum.git \
 	; cd rum \
 	; make USE_PGXS=1 \
 	; make USE_PGXS=1 install \
+	\
 	; cd $build_dir \
 	; git clone https://github.com/eulerto/wal2json.git \
 	; cd wal2json \
 	; USE_PGXS=1 make \
 	; USE_PGXS=1 make install \
+	\
 	; cd $build_dir \
 	; git clone https://github.com/jaiminpan/pg_jieba \
   	; cd pg_jieba \
@@ -50,6 +53,15 @@ RUN set -eux \
 		-DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/12/server \
 	; make \
 	; make install \
+	\
+	; cd $build_dir \
+    ; timescaledb_version=1.7.0 \
+    ; wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
+    ; cd timescaledb \
+    ; ./bootstrap \
+    ; cd build && make \
+    ; make install \
+	\
 	; rm -rf $build_dir \
 	\
 	; apt-get purge -y --auto-remove ${BUILD_DEPS:-} \
