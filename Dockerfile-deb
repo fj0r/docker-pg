@@ -75,4 +75,4 @@ RUN ln -sf usr/local/bin/docker-entrypoint.sh / # backwards compat
 ENV PGC_SHARED_BUFFERS=128MB
 ENV PGC_WAL_LEVEL=logical
 ENV PGC_MAX_REPLICATION_SLOTS=10
-#ENV PGC_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,pg_jieba.so'"
+ENV PGC_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,timescaledb,pg_jieba.so'"
