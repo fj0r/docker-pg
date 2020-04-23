@@ -266,12 +266,12 @@ _pg_want_help() {
 	return 1
 }
 
-customize_config() {
-	echo 'Customize PostgreSQL...'
+pg_setup_conf() {
+	echo "## Setup \"$PGDATA/postgresql.conf\""
 
 	local sed_cmd="sed -i \"$PGDATA/postgresql.conf\""
 
-	for i in "${!PGC_@}"; do
+	for i in "${!PGCONF_@}"; do
 		local k=$(echo ${i:4} | tr '[:upper:]' '[:lower:]')
 		local v=$(eval "echo \"\$$i\"")
 		echo "  set $k = $v"
@@ -293,7 +293,7 @@ _main() {
 		docker_create_db_directories
 		if [ "$(id -u)" = '0' ]; then
 			# then restart script as postgres user
-			exec su-exec postgres "$BASH_SOURCE" "$@"
+			exec gosu postgres "$BASH_SOURCE" "$@"
 		fi
 
 		# only run initialization on an empty data directory
@@ -305,6 +305,7 @@ _main() {
 
 			docker_init_database_dir
 			pg_setup_hba_conf
+			pg_setup_conf
 
 			# PGPASSWORD is required for psql when authentication is required for 'local' connections via pg_hba.conf and is otherwise harmless
 			# e.g. when '--auth=md5' or '--auth-local=md5' is used in POSTGRES_INITDB_ARGS
@@ -317,7 +318,6 @@ _main() {
 			docker_temp_server_stop
 			unset PGPASSWORD
 
-			customize_config
 
 			echo
 			echo 'PostgreSQL init process complete; ready for start up.'
