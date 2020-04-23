@@ -272,23 +272,25 @@ pg_setup_conf() {
 	local sed_cmd="sed -i \"$PGDATA/postgresql.conf\""
 
 	for i in "${!PGCONF_@}"; do
-		local k=$(echo ${i:4} | tr '[:upper:]' '[:lower:]')
+		local k=$(echo ${i:7} | tr '[:upper:]' '[:lower:]')
 		local v=$(eval "echo \"\$$i\"")
-		echo "  set $k = $v"
-		sed_cmd+=" -e \"s/.*\(${k}\s*=\s*\)\(.*\)/\1${v} ## \2/\""
+        if [ -n "$v" ]; then
+			echo "  set $k = $v"
+			sed_cmd+=" -e \"s/.*\(${k}\s*=\s*\)\(.*\)/\1${v} ## \2/\""
+		fi
 	done
 	echo "with cmd: $sed_cmd"
 	eval $sed_cmd
 
-	if [ -n "$PGJIEBA_HMMMODEL" ]; then
-		echo "pg_jieba.hmm_model = '$PGJIEBA_HMMMODEL'" >> $PGDATA/postgresql.conf
-	fi
-	if [ -n "$PGJIEBA_BASEDICT" ]; then
-		echo "pg_jieba.base_dict = '$PGJIEBA_BASEDICT'" >> $PGDATA/postgresql.conf
-	fi
-	if [ -n "$PGJIEBA_USERDICT" ]; then
-		echo "pg_jieba.user_dict = '$PGJIEBA_USERDICT'" >> $PGDATA/postgresql.conf
-	fi
+	for i in "${!PG_JIEBA_@}"; do
+		local k="pg_jieba.$(echo ${i:9} | tr '[:upper:]' '[:lower:]')"
+		local v=$(eval "echo \"\$$i\"")
+        if [ -n "$v" ]; then
+			echo "  set $k = '$v'"
+			echo "$k = '$v'" >> $PGDATA/postgresql.conf
+		fi
+	done
+
 }
 
 _main() {
