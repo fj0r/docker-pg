@@ -1,4 +1,0 @@
-FROM nnurphy/pg
-
-
-ARG jieba_dict_url=https://iffy.me/pub/367w.dict.tar.xz
