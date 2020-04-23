@@ -1,3 +1,4 @@
 FROM nnurphy/pg
 
-RUN mkdir -p /docker-entrypoint-initdb.d
+
+ARG jieba_dict_url=https://iffy.me/pub/367w.dict.tar.xz

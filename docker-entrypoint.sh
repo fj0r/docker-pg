@@ -279,6 +279,16 @@ pg_setup_conf() {
 	done
 	echo "with cmd: $sed_cmd"
 	eval $sed_cmd
+
+	if [ -n "$PGJIEBA_HMMMODEL" ]; then
+		echo "pg_jieba.hmm_model = '$PGJIEBA_HMMMODEL'" >> $PGDATA/postgresql.conf
+	fi
+	if [ -n "$PGJIEBA_BASEDICT" ]; then
+		echo "pg_jieba.base_dict = '$PGJIEBA_BASEDICT'" >> $PGDATA/postgresql.conf
+	fi
+	if [ -n "$PGJIEBA_USERDICT" ]; then
+		echo "pg_jieba.user_dict = '$PGJIEBA_USERDICT'" >> $PGDATA/postgresql.conf
+	fi
 }
 
 _main() {
