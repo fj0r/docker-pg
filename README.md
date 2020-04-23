@@ -32,20 +32,15 @@ This optional variable can be used to define another location - like a subdirect
 
 This is an environment variable that is not Docker specific. Because the variable is used by the postgres server binary (see the PostgreSQL docs), the entrypoint script takes it into account.
 
-## CUSTOMIZE ENTRYPOINT
-``` bash
-customize_config() {
-	echo 'Customize PostgreSQL...'
-	sed -i "s/\(shared_buffers\s*=\s*\).*\(\s*.#\) /\1${PG_SHARED_BUFFERS:-128MB}\2/" "$PGDATA/postgresql.conf"
-	{
-		echo
-		echo "wal_level = logical"
-		echo "shared_preload_libraries = 'pg_stat_statements'  #,timescaledb,pg_jieba.so"
-		#echo "jit_provider = 'llvmjit'"
-	} >> "$PGDATA/postgresql.conf"
-}
+# start
+```bash
+docker run --name test-fts --rm \
+    -p 5532:5432 \
+    -e POSTGRES_PASSWORD=123456 \
+    -e PGCONF_SHARED_BUFFERS=512MB \
+    -v $PWD/user.dict:/usr/share/postgresql/12/tsearch_data/jieba_user.dict \
+    nnurphy/pg
 ```
-
 # test wal2json
 ```bash
 pg_recvlogical -U postgres -d postgres --slot test_slot --create-slot -P wal2json
