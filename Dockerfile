@@ -72,7 +72,9 @@ RUN set -eux \
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN ln -sf usr/local/bin/docker-entrypoint.sh / # backwards compat
 
-ENV PGCONF_SHARED_BUFFERS=128MB
+ENV PGCONF_SHARED_BUFFERS=2GB
+ENV PGCONF_WORK_MEM=8MB
+ENV PGCONF_EFFECTIVE_CACHE_SIZE=8GB
 ENV PGCONF_WAL_LEVEL=logical
 ENV PGCONF_MAX_REPLICATION_SLOTS=10
 ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,timescaledb,pg_jieba.so'"

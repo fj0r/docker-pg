@@ -260,30 +260,24 @@ _pg_want_help() {
 }
 
 pg_setup_conf() {
-	echo "## Setup \"$PGDATA/postgresql.conf\""
-
-	local sed_cmd="sed -i \"$PGDATA/postgresql.conf\""
+	echo "## Setup \"$PGDATA/usr.conf\""
+	echo "" > $PGDATA/usr.conf
 
 	for i in "${!PGCONF_@}"; do
 		local k=$(echo ${i:7} | tr '[:upper:]' '[:lower:]')
 		local v=$(eval "echo \"\$$i\"")
         if [ -n "$v" ]; then
-			echo "  set $k = $v"
-			sed_cmd+=" -e \"s/.*\(${k}\s*=\s*\)\(.*\)/\1${v} ## \2/\""
+			echo "$k = $v" >> $PGDATA/usr.conf
 		fi
 	done
-	echo "with cmd: $sed_cmd"
-	eval $sed_cmd
 
 	for i in "${!PG_JIEBA_@}"; do
 		local k="pg_jieba.$(echo ${i:9} | tr '[:upper:]' '[:lower:]')"
 		local v=$(eval "echo \"\$$i\"")
         if [ -n "$v" ]; then
-			echo "  set $k = '$v'"
-			echo "$k = '$v'" >> $PGDATA/postgresql.conf
+			echo "$k = $v" >> $PGDATA/usr.conf
 		fi
 	done
-
 }
 
 _main() {
@@ -310,7 +304,7 @@ _main() {
 
 			docker_init_database_dir
 			pg_setup_hba_conf
-			pg_setup_conf
+			echo "include_if_exists = 'usr.conf'">> $PGDATA/postgresql.conf
 
 			# PGPASSWORD is required for psql when authentication is required for 'local' connections via pg_hba.conf and is otherwise harmless
 			# e.g. when '--auth=md5' or '--auth-local=md5' is used in POSTGRES_INITDB_ARGS
@@ -333,6 +327,7 @@ _main() {
 		fi
 	fi
 
+	pg_setup_conf
 	exec "$@"
 }
 
