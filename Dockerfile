@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM postgres:12.2
+FROM postgres:12.3
 
 ENV BUILD_DEPS \
 	git \
