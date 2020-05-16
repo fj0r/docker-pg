@@ -69,6 +69,7 @@ RUN set -eux \
 	; apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 
+COPY .psqlrc /root
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN ln -sf usr/local/bin/docker-entrypoint.sh / # backwards compat
 
