@@ -23,6 +23,9 @@ RUN apt update \
         libpq-dev \
         postgresql-server-dev-${PG_MAJOR} \
         git \
+ && apt install -y --no-install-recommends \
+        osm2pgsql \
+        osm2pgrouting \
  && mkdir -p /usr/src/pgrouting \
  && cd /usr/src/pgrouting \
  && git init \
