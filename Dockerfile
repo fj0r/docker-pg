@@ -56,7 +56,7 @@ RUN set -eux \
 	; make install \
 	\
 	; cd $build_dir \
-    ; timescaledb_version=1.7.1 \
+    ; timescaledb_version=1.7.2 \
     ; wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
     ; cd timescaledb-${timescaledb_version} \
     ; ./bootstrap -DREGRESS_CHECKS=OFF \
