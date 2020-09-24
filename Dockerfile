@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM postgres:12.4
+FROM postgres:13
 
 ENV BUILD_DEPS \
 	git \
@@ -9,7 +9,7 @@ ENV BUILD_DEPS \
 	ca-certificates \
 	libpq-dev \
 	libssl-dev \
-	postgresql-server-dev-12
+	postgresql-server-dev-13
 
 #ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
@@ -22,7 +22,8 @@ RUN set -eux \
 	; locale-gen \
 	; apt-get update \
 	; apt-get install -y --no-install-recommends \
-		postgresql-plpython3-12 postgresql-12-python3-multicorn \
+		postgresql-plpython3-13 \
+		# postgresql-12-python3-multicorn
 		python3-pip python3-setuptools \
 		${BUILD_DEPS:-} \
 	; pip3 --no-cache-dir install \
@@ -33,10 +34,10 @@ RUN set -eux \
 	; mkdir -p $build_dir \
 	; cd $build_dir \
 	\
-	; git clone https://github.com/postgrespro/rum.git \
-	; cd rum \
-	; make USE_PGXS=1 \
-	; make USE_PGXS=1 install \
+	#; git clone https://github.com/postgrespro/rum.git \
+	#; cd rum \
+	#; make USE_PGXS=1 \
+	#; make USE_PGXS=1 install \
 	\
 	; cd $build_dir \
 	; git clone https://github.com/eulerto/wal2json.git \
@@ -51,17 +52,17 @@ RUN set -eux \
 	; mkdir build \
 	; cd build \
 	; cmake .. \
-		-DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/12/server \
+		-DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/13/server \
 	; make \
 	; make install \
 	\
-	; cd $build_dir \
-    ; timescaledb_version=1.7.4 \
-    ; wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
-    ; cd timescaledb-${timescaledb_version} \
-    ; ./bootstrap -DREGRESS_CHECKS=OFF \
-    ; cd build && make \
-    ; make install \
+	# ; cd $build_dir \
+    # ; timescaledb_version=1.7.4 \
+    # ; wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
+    # ; cd timescaledb-${timescaledb_version} \
+    # ; ./bootstrap -DREGRESS_CHECKS=OFF \
+    # ; cd build && make \
+    # ; make install \
 	\
 	; rm -rf $build_dir \
 	\
