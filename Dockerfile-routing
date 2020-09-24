@@ -2,8 +2,8 @@ FROM nnurphy/pg:gis
 
 LABEL maintainer="pgRouting Project - https://pgrouting.net"
 
-ENV PGROUTING_VERSION 3.0.1
-ENV PGROUTING_SHA256 b8da69ebe2f46eb5ec2eb6dfc0d3960d26cedf7e2a509cf58f459c2fd0ae53b3
+ENV PGROUTING_VERSION 3.1.0
+ENV PGROUTING_SHA256 0471970338e38730092b39c8e87fde83e3100c471d856de24111005f6a91d481
 
 RUN set -ex \
  && apt update \
@@ -44,7 +44,7 @@ RUN set -ex \
  && make install \
  && cd / \
  && rm -rf /usr/src/pgrouting \
- && apt-mark manual postgresql-12 \
+ && apt-mark manual postgresql-13 \
  && apt purge -y --autoremove \
         build-essential \
         cmake \
