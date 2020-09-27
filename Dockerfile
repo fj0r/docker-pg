@@ -51,13 +51,13 @@ RUN set -eux \
 	; make \
 	; make install \
 	\
-	# ; cd $build_dir \
-    # ; timescaledb_version=1.7.4 \
-    # ; wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
-    # ; cd timescaledb-${timescaledb_version} \
-    # ; ./bootstrap -DREGRESS_CHECKS=OFF \
-    # ; cd build && make \
-    # ; make install \
+	; cd $build_dir \
+    ; timescaledb_version=2.0.0-beta6 \
+    ; wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
+    ; cd timescaledb-${timescaledb_version} \
+    ; ./bootstrap -DREGRESS_CHECKS=OFF \
+    ; cd build && make \
+    ; make install \
 	\
 	; rm -rf $build_dir \
 	\
