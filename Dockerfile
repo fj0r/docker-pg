@@ -11,6 +11,8 @@ ENV BUILD_DEPS \
 	libssl-dev \
 	postgresql-server-dev-${PG_MAJOR}
 
+ENV TIMESCALEDB_VERSION=2.0.0-beta6
+
 #ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
@@ -52,9 +54,8 @@ RUN set -eux \
 	; make install \
 	\
 	; cd $build_dir \
-    ; timescaledb_version=2.0.0-beta6 \
-    ; wget -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
-    ; cd timescaledb-${timescaledb_version} \
+    ; wget -O- https://github.com/timescale/timescaledb/archive/${TIMESCALEDB_VERSION}.tar.gz | tar zxf - \
+    ; cd timescaledb-${TIMESCALEDB_VERSION} \
     ; ./bootstrap -DREGRESS_CHECKS=OFF \
     ; cd build && make \
     ; make install \
@@ -79,5 +80,4 @@ ENV PGCONF_EFFECTIVE_IO_CONCURRENCY=200
 ENV PGCONF_RANDOM_PAGE_COST=1.1
 ENV PGCONF_WAL_LEVEL=logical
 ENV PGCONF_MAX_REPLICATION_SLOTS=10
-#ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,timescaledb,pg_jieba.so'"
-ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,pg_jieba.so'"
+ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,timescaledb,pg_jieba.so'"
