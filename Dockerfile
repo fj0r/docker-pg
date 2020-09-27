@@ -9,7 +9,7 @@ ENV BUILD_DEPS \
 	ca-certificates \
 	libpq-dev \
 	libssl-dev \
-	postgresql-server-dev-13
+	postgresql-server-dev-${PG_MAJOR}
 
 #ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
@@ -22,7 +22,8 @@ RUN set -eux \
 	; locale-gen \
 	; apt-get update \
 	; apt-get install -y --no-install-recommends \
-		postgresql-plpython3-13 \
+		postgresql-plpython3-${PG_MAJOR} \
+		postgresql-${PG_MAJOR}-wal2json \
 		# postgresql-12-python3-multicorn
 		python3-pip python3-setuptools \
 		${BUILD_DEPS:-} \
@@ -40,19 +41,13 @@ RUN set -eux \
 	#; make USE_PGXS=1 install \
 	\
 	; cd $build_dir \
-	; git clone https://github.com/eulerto/wal2json.git \
-	; cd wal2json \
-	; USE_PGXS=1 make \
-	; USE_PGXS=1 make install \
-	\
-	; cd $build_dir \
 	; git clone https://github.com/jaiminpan/pg_jieba \
   	; cd pg_jieba \
   	; git submodule update --init --recursive  \
 	; mkdir build \
 	; cd build \
 	; cmake .. \
-		-DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/13/server \
+		-DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/${PG_MAJOR}/server \
 	; make \
 	; make install \
 	\
