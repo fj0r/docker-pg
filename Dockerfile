@@ -37,10 +37,10 @@ RUN set -eux \
 	; mkdir -p $build_dir \
 	; cd $build_dir \
 	\
-	; git clone https://github.com/postgrespro/rum.git \
-	; cd rum \
-	; make USE_PGXS=1 \
-	; make USE_PGXS=1 install \
+	#; git clone https://github.com/postgrespro/rum.git \
+	#; cd rum \
+	#; make USE_PGXS=1 \
+	#; make USE_PGXS=1 install \
 	\
 	; cd $build_dir \
 	; git clone https://github.com/jaiminpan/pg_jieba \
