@@ -37,10 +37,10 @@ RUN set -eux \
 	; mkdir -p $build_dir \
 	; cd $build_dir \
 	\
-	#; git clone https://github.com/postgrespro/rum.git \
-	#; cd rum \
-	#; make USE_PGXS=1 \
-	#; make USE_PGXS=1 install \
+	; git clone https://github.com/postgrespro/rum.git \
+	; cd rum \
+	; make USE_PGXS=1 \
+	; make USE_PGXS=1 install \
 	\
 	; cd $build_dir \
 	; git clone https://github.com/jaiminpan/pg_jieba \
@@ -53,12 +53,12 @@ RUN set -eux \
 	; make \
 	; make install \
 	\
-	; cd $build_dir \
-    ; wget -q -O- https://github.com/timescale/timescaledb/archive/${TIMESCALEDB_VERSION}.tar.gz | tar zxf - \
-    ; cd timescaledb-${TIMESCALEDB_VERSION} \
-    ; ./bootstrap -DREGRESS_CHECKS=OFF \
-    ; cd build && make \
-    ; make install \
+	#; cd $build_dir \
+    #; wget -q -O- https://github.com/timescale/timescaledb/archive/${TIMESCALEDB_VERSION}.tar.gz | tar zxf - \
+    #; cd timescaledb-${TIMESCALEDB_VERSION} \
+    #; ./bootstrap -DREGRESS_CHECKS=OFF \
+    #; cd build && make \
+    #; make install \
 	\
 	; rm -rf $build_dir \
 	\
@@ -80,5 +80,5 @@ ENV PGCONF_EFFECTIVE_IO_CONCURRENCY=200
 ENV PGCONF_RANDOM_PAGE_COST=1.1
 ENV PGCONF_WAL_LEVEL=logical
 ENV PGCONF_MAX_REPLICATION_SLOTS=10
-ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,timescaledb,pg_jieba.so'"
-#ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,pg_jieba.so'"
+#ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,timescaledb,pg_jieba.so'"
+ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,pg_jieba.so'"
