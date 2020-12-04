@@ -189,7 +189,7 @@ docker_setup_db() {
 	fi
 
 	for extension in $(awk -F',' '{for (i = 1 ; i <= NF ; i++) print $i}' <<< "${POSTGRES_EXTENSION}"); do
-		docker_process_sql --dbname postgres --set db="$POSTGRES_DB" <<-'EOSQL'
+		docker_process_sql --dbname postgres --set db="$POSTGRES_DB" <<- EOSQL
 			CREATE EXTENSION IF NOT EXISTS ${extension};
 		EOSQL
   	done
