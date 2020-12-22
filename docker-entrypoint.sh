@@ -96,10 +96,14 @@ docker_verify_minimum_env() {
 	# messes it up
 	if [ "${#POSTGRES_PASSWORD}" -ge 100 ]; then
 		cat >&2 <<-'EOWARN'
+
 			WARNING: The supplied POSTGRES_PASSWORD is 100+ characters.
+
 			  This will not work if used via PGPASSWORD with "psql".
+
 			  https://www.postgresql.org/message-id/flat/E1Rqxp2-0004Qt-PL%40wrigleys.postgresql.org (BUG #6412)
 			  https://github.com/docker-library/postgres/issues/507
+
 		EOWARN
 	fi
 	if [ -z "$POSTGRES_PASSWORD" ] && [ 'trust' != "$POSTGRES_HOST_AUTH_METHOD" ]; then
@@ -108,8 +112,10 @@ docker_verify_minimum_env() {
 			Error: Database is uninitialized and superuser password is not specified.
 			       You must specify POSTGRES_PASSWORD to a non-empty value for the
 			       superuser. For example, "-e POSTGRES_PASSWORD=password" on "docker run".
+
 			       You may also use "POSTGRES_HOST_AUTH_METHOD=trust" to allow all
 			       connections without a password. This is *not* recommended.
+
 			       See PostgreSQL documentation about "trust":
 			       https://www.postgresql.org/docs/current/auth-trust.html
 		EOE
@@ -125,6 +131,7 @@ docker_verify_minimum_env() {
 			         https://www.postgresql.org/docs/current/auth-trust.html
 			         In Docker's default configuration, this is effectively any other
 			         container on the same system.
+
 			         It is not recommended to use POSTGRES_HOST_AUTH_METHOD=trust. Replace
 			         it with "-e POSTGRES_PASSWORD=password" instead to set a password in
 			         "docker run".
@@ -219,7 +226,7 @@ pg_setup_hba_conf() {
 		echo
 		if [ 'trust' = "$POSTGRES_HOST_AUTH_METHOD" ]; then
 			echo '# warning trust is enabled for all connections'
-			echo '# see https://www.postgresql.org/docs/13/auth-trust.html'
+			echo '# see https://www.postgresql.org/docs/12/auth-trust.html'
 		fi
 		echo "host all all all $POSTGRES_HOST_AUTH_METHOD"
 	} >> "$PGDATA/pg_hba.conf"
