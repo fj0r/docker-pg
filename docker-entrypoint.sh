@@ -37,7 +37,8 @@ docker_create_db_directories() {
 	local user; user="$(id -u)"
 
 	mkdir -p "$PGDATA"
-	chmod 700 "$PGDATA"
+	# ignore failure since there are cases where we can't chmod (and PostgreSQL might fail later anyhow - it's picky about permissions of this directory)
+	chmod 700 "$PGDATA" || :
 
 	# ignore failure since it will be fine when using the image provided directory; see also https://github.com/docker-library/postgres/pull/289
 	mkdir -p /var/run/postgresql || :
@@ -188,7 +189,13 @@ docker_process_sql() {
 # create initial database
 # uses environment variables for input: POSTGRES_DB
 docker_setup_db() {
-	if [ "$POSTGRES_DB" != 'postgres' ]; then
+	local dbAlreadyExists
+	dbAlreadyExists="$(
+		POSTGRES_DB= docker_process_sql --dbname postgres --set db="$POSTGRES_DB" --tuples-only <<-'EOSQL'
+			SELECT 1 FROM pg_database WHERE datname = :'db' ;
+		EOSQL
+	)"
+	if [ -z "$dbAlreadyExists" ]; then
 		POSTGRES_DB= docker_process_sql --dbname postgres --set db="$POSTGRES_DB" <<-'EOSQL'
 			CREATE DATABASE :"db" ;
 		EOSQL
@@ -199,7 +206,7 @@ docker_setup_db() {
 		docker_process_sql --dbname postgres --set db="$POSTGRES_DB" <<- EOSQL
 			CREATE EXTENSION IF NOT EXISTS ${extension};
 		EOSQL
-  	done
+	done
 }
 
 # Loads various settings that are used elsewhere in the script
