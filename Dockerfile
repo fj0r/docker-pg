@@ -4,6 +4,8 @@ FROM postgres:13
 ENV BUILD_DEPS \
     git \
     cmake \
+    pkg-config \
+    libcurl4-openssl-dev \
     wget \
     build-essential \
     ca-certificates \
