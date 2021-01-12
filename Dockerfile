@@ -6,6 +6,7 @@ ENV BUILD_DEPS \
     cmake \
     pkg-config \
     libcurl4-openssl-dev \
+    uuid-dev \
     wget \
     build-essential \
     ca-certificates \
@@ -30,6 +31,7 @@ RUN set -eux \
       postgresql-${PG_MAJOR}-wal2json \
       postgresql-${PG_MAJOR}-mysql-fdw \
       python3-pip python3-setuptools \
+      libcurl4 \
       ${BUILD_DEPS:-} \
   ; pip3 --no-cache-dir install \
       numpy requests pyyaml furl \
