@@ -26,6 +26,7 @@ RUN set -eux \
   ; apt-get install -y --no-install-recommends \
       postgresql-plpython3-${PG_MAJOR} \
       postgresql-${PG_MAJOR}-wal2json \
+      postgresql-${PG_MAJOR}-mysql-fdw \
       python3-pip python3-setuptools \
       ${BUILD_DEPS:-} \
   ; pip3 --no-cache-dir install \
@@ -40,6 +41,13 @@ RUN set -eux \
   #; cd rum \
   #; make USE_PGXS=1 \
   #; make USE_PGXS=1 install \
+  \
+  ; cd $build_dir \
+  ; git clone https://github.com/adjust/clickhouse_fdw.git \
+  ; cd clickhouse_fdw \
+  ; mkdir build && cd build \
+  ; cmake .. \
+  ; make && make install \
   \
   ; cd $build_dir \
   ; git clone https://github.com/jaiminpan/pg_jieba \
