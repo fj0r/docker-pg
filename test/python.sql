@@ -7,8 +7,8 @@ import yaml
 import functools
 import more_itertools as mi
 import pyparsing
-import furl
 import numpy as np
+import pandas as pd
 import cachetools
 import subprocess as subp
 m = sys.modules
@@ -26,4 +26,4 @@ import requests
 yield requests.get(url).text
 $$ LANGUAGE plpython3u;
 
-SELECT  py_requests_get('http://www.baidu.com');
+SELECT py_requests_get('http://www.baidu.com');
