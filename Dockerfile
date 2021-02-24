@@ -39,7 +39,7 @@ RUN set -eux \
   ; mkdir -p $build_dir \
   ; cd $build_dir \
   \
-  ; rum_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
+  ; rum_version=$(wget -qO- -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
   ; cd $build_dir \
   ; wget -q -O- https://github.com/postgrespro/rum/archive/${rum_version}.tar.gz | tar zxf - \
   ; cd rum-${rum_version} \
@@ -64,7 +64,7 @@ RUN set -eux \
   ; make \
   ; make install \
   \
-  ; timescaledb_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/timescale/timescaledb/releases | jq -r '.[0].tag_name') \
+  ; timescaledb_version=$(wget -qO- -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/timescale/timescaledb/releases | jq -r '.[0].tag_name') \
   ; cd $build_dir \
   ; wget -q -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
   ; cd timescaledb-${TIMESCALEDB_VERSION} \
