@@ -14,8 +14,6 @@ ENV BUILD_DEPS \
     libssl-dev \
     postgresql-server-dev-${PG_MAJOR}
 
-ENV TIMESCALEDB_VERSION=2.0.0
-
 #ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
@@ -41,10 +39,12 @@ RUN set -eux \
   ; mkdir -p $build_dir \
   ; cd $build_dir \
   \
-  #; git clone https://github.com/postgrespro/rum.git \
-  #; cd rum \
-  #; make USE_PGXS=1 \
-  #; make USE_PGXS=1 install \
+  ; rum_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
+  ; cd $build_dir \
+  ; wget -q -O- https://github.com/postgrespro/rum/archive/${rum_version}.tar.gz | tar zxf - \
+  ; cd rum-${rum_version} \
+  ; make USE_PGXS=1 \
+  ; make USE_PGXS=1 install \
   \
   ; cd $build_dir \
   ; git clone https://github.com/adjust/clickhouse_fdw.git \
@@ -64,12 +64,13 @@ RUN set -eux \
   ; make \
   ; make install \
   \
-  #; cd $build_dir \
-  #; wget -q -O- https://github.com/timescale/timescaledb/archive/${TIMESCALEDB_VERSION}.tar.gz | tar zxf - \
-  #; cd timescaledb-${TIMESCALEDB_VERSION} \
-  #; ./bootstrap -DREGRESS_CHECKS=OFF \
-  #; cd build && make \
-  #; make install \
+  ; timescaledb_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/timescale/timescaledb/releases | jq -r '.[0].tag_name') \
+  ; cd $build_dir \
+  ; wget -q -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
+  ; cd timescaledb-${TIMESCALEDB_VERSION} \
+  ; ./bootstrap -DREGRESS_CHECKS=OFF \
+  ; cd build && make \
+  ; make install \
   \
   ; rm -rf $build_dir \
   \
