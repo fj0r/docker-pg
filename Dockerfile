@@ -13,6 +13,7 @@ ENV BUILD_DEPS \
     libpq-dev \
     libssl-dev \
     python3-dev \
+    libkrb5-dev \
     postgresql-server-dev-${PG_MAJOR}
 
 #ENV LANG zh_CN.utf8
