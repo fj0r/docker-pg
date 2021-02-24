@@ -7,11 +7,12 @@ ENV BUILD_DEPS \
     pkg-config \
     libcurl4-openssl-dev \
     uuid-dev \
-    wget \
+    wget curl jq \
     build-essential \
     ca-certificates \
     libpq-dev \
     libssl-dev \
+    python3-dev \
     postgresql-server-dev-${PG_MAJOR}
 
 #ENV LANG zh_CN.utf8
@@ -32,8 +33,8 @@ RUN set -eux \
       libcurl4 \
       ${BUILD_DEPS:-} \
   ; pip3 --no-cache-dir install \
-      numpy requests pyyaml furl \
-      cachetools more-itertools PyParsing \
+      pgcli numpy pandas requests pyyaml \
+      cachetools more-itertools fn.py PyParsing \
   \
   ; build_dir=/root/build \
   ; mkdir -p $build_dir \
@@ -67,7 +68,7 @@ RUN set -eux \
   ; timescaledb_version=$(wget -qO- -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/timescale/timescaledb/releases | jq -r '.[0].tag_name') \
   ; cd $build_dir \
   ; wget -q -O- https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
-  ; cd timescaledb-${TIMESCALEDB_VERSION} \
+  ; cd timescaledb-${timescaledb_version} \
   ; ./bootstrap -DREGRESS_CHECKS=OFF \
   ; cd build && make \
   ; make install \
