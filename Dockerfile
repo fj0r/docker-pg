@@ -81,6 +81,7 @@ RUN set -eux \
 
 
 COPY .psqlrc /root
+COPY pgcli_config /root/.config/pgcli/config
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN ln -sf usr/local/bin/docker-entrypoint.sh / # backwards compat
 
