@@ -290,6 +290,8 @@ pg_setup_conf() {
 			echo "$k = $v" >> $PGDATA/usr.conf
 		fi
 	done
+	echo "pg_stat_statements.max = 10000" >> $PGDATA/usr.conf
+	echo "pg_stat_statements.track = all" >> $PGDATA/usr.conf
 
 	for i in "${!PG_JIEBA_@}"; do
 		local k="pg_jieba.$(echo ${i:9} | tr '[:upper:]' '[:lower:]')"
