@@ -3,7 +3,7 @@ FROM nnurphy/pg:12
 ENV BUILD_DEPS \
 	git \
 	cmake \
-	wget \
+	curl \
 	build-essential \
 	ca-certificates \
 	libpq-dev \

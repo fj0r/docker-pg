@@ -32,8 +32,8 @@ RUN set -ex \
         libcgal13 \
  && apt install -y \
         build-essential \
+        curl \
         cmake \
-        wget \
         libboost-graph-dev \
         libcgal-dev \
         libpq-dev \
@@ -41,7 +41,7 @@ RUN set -ex \
  && apt install -y --no-install-recommends \
         osm2pgsql \
         osm2pgrouting \
- && wget -q -O pgrouting.tar.gz "https://github.com/pgRouting/pgrouting/archive/v${PGROUTING_VERSION}.tar.gz" \
+ && curl -sSLo pgrouting.tar.gz "https://github.com/pgRouting/pgrouting/archive/v${PGROUTING_VERSION}.tar.gz" \
  && echo "$PGROUTING_SHA256 *pgrouting.tar.gz" | sha256sum -c - \
  && mkdir -p /usr/src/pgrouting \
  && tar \
@@ -62,7 +62,6 @@ RUN set -ex \
  && apt purge -y --autoremove \
         build-essential \
         cmake \
-        wget \
         libcgal-dev \
         libpq-dev \
         libboost-graph-dev \
