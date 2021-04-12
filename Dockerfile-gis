@@ -33,6 +33,7 @@ RUN set -ex \
  && apt install -y \
         build-essential \
         curl \
+        ca-certificates \
         cmake \
         libboost-graph-dev \
         libcgal-dev \
