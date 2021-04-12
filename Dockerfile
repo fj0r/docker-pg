@@ -39,10 +39,17 @@ RUN set -eux \
   \
   ; build_dir=/root/build \
   ; mkdir -p $build_dir \
-  ; cd $build_dir \
   \
-  ; rum_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
   ; cd $build_dir \
+  ; anonymizer_version=$(curl -sSL "https://gitlab.com/api/v4/projects/7709206/releases" | jq -r '.[0].name') \
+  ; curl -sSL https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${anonymizer_version}/postgresql_anonymizer-${anonymizer_version}.tar.gz \
+    | tar zxf - \
+  ; cd postgresql_anonymizer-${anonymizer_version} \
+  ; make extension \
+  ; make install \
+  \
+  ; cd $build_dir \
+  ; rum_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
   ; curl -sSL https://github.com/postgrespro/rum/archive/${rum_version}.tar.gz | tar zxf - \
   ; cd rum-${rum_version} \
   ; make USE_PGXS=1 \
@@ -66,8 +73,8 @@ RUN set -eux \
   ; make \
   ; make install \
   \
-  ; timescaledb_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/timescale/timescaledb/releases | jq -r '.[0].tag_name') \
   ; cd $build_dir \
+  ; timescaledb_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/timescale/timescaledb/releases | jq -r '.[0].tag_name') \
   ; curl -sSL https://github.com/timescale/timescaledb/archive/${timescaledb_version}.tar.gz | tar zxf - \
   ; cd timescaledb-${timescaledb_version} \
   ; ./bootstrap -DREGRESS_CHECKS=OFF \
