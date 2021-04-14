@@ -7,14 +7,22 @@ ENV BUILD_DEPS \
     pkg-config \
     libcurl4-openssl-dev \
     uuid-dev \
-    curl jq \
     build-essential \
-    ca-certificates \
     libpq-dev \
     libssl-dev \
     python3-dev \
     libkrb5-dev \
     postgresql-server-dev-${PG_MAJOR}
+
+ENV BUILD_CITUS_DEPS \
+    libcurl4-gnutls-dev \
+    libicu-dev \
+    liblz4-dev \
+    libpam0g-dev \
+    libreadline-dev \
+    libselinux1-dev \
+    libxslt-dev \
+    libzstd-dev
 
 #ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
@@ -31,14 +39,25 @@ RUN set -eux \
       postgresql-${PG_MAJOR}-wal2json \
       postgresql-${PG_MAJOR}-mysql-fdw \
       python3-pip python3-setuptools \
-      libcurl4 \
+      libcurl4 curl jq ca-certificates \
       ${BUILD_DEPS:-} \
+      ${BUILD_CITUS_DEPS:-} \
   ; pip3 --no-cache-dir install \
       pgcli numpy pandas requests pyyaml \
       cachetools more-itertools fn.py PyParsing \
   \
+  #; curl -sSL https://install.citusdata.com/community/deb.sh | bash \
+  #; apt-get install -y --no-install-recommends postgresql-13-citus-10.0 \
+  \
   ; build_dir=/root/build \
   ; mkdir -p $build_dir \
+  \
+  ; cd $build_dir \
+  ; citus_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/citusdata/citus/releases | jq -r '.[0].tag_name' | cut -c 2-) \
+  ; curl -sSL https://github.com/citusdata/citus/archive/refs/tags/v${citus_version}.tar.gz | tar zxf - \
+  ; cd citus-${citus_version} \
+  ; ./configure \
+  ; make && make install \
   \
   ; cd $build_dir \
   ; anonymizer_version=$(curl -sSL "https://gitlab.com/api/v4/projects/7709206/releases" | jq -r '.[0].name') \
@@ -83,7 +102,7 @@ RUN set -eux \
   \
   ; rm -rf $build_dir \
   \
-  ; apt-get purge -y --auto-remove ${BUILD_DEPS:-} \
+  ; apt-get purge -y --auto-remove ${BUILD_DEPS:-} ${BUILD_CITUS_DEPS:-}\
   ; apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 
@@ -102,5 +121,5 @@ ENV PGCONF_EFFECTIVE_IO_CONCURRENCY=200
 ENV PGCONF_RANDOM_PAGE_COST=1.1
 ENV PGCONF_WAL_LEVEL=logical
 ENV PGCONF_MAX_REPLICATION_SLOTS=10
-ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,timescaledb,anon,pg_jieba.so'"
+ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,citus,timescaledb,anon,pg_jieba.so'"
 #ENV PGCONF_SHARED_PRELOAD_LIBRARIES="'pg_stat_statements,pg_jieba.so'"
