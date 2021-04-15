@@ -83,6 +83,7 @@ RUN set -eux \
   ; cd $build_dir \
   ; git clone https://github.com/jaiminpan/pg_jieba \
   ; cd pg_jieba \
+  ; sed -i jieba.cpp -e 's!QuerySegment!FullSegment!g' \
   ; git submodule update --init --recursive  \
   ; mkdir build \
   ; cd build \
