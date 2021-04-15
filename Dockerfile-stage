@@ -1,4 +1,4 @@
-FROM nnurphy/pg:12
+FROM nnurphy/pg
 
 ENV BUILD_DEPS \
 	git \
@@ -7,23 +7,16 @@ ENV BUILD_DEPS \
 	build-essential \
 	ca-certificates \
 	libpq-dev \
-	postgresql-server-dev-12
+	postgresql-server-dev-13
 
 RUN set -eux \
-    ; sed -i 's/\(.*\)\(security\|deb\).debian.org\(.*\)main/\1ftp2.cn.debian.org\3main contrib non-free/g' /etc/apt/sources.list \
     ; apt-get update \
 	; apt-get install -y --no-install-recommends \
 		${BUILD_DEPS:-} \
     ; cd /root \
     ; git clone https://github.com/jaiminpan/pg_jieba \
     ; cd pg_jieba \
-  	; git submodule update --init --recursive
+    ; git submodule update --init --recursive
 
 WORKDIR /root/pg_jieba
 
-RUN set -eux \
-	; mkdir build \
-	; cd build \
-	; cmake .. -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/12/server \
-	; make \
-	; make install

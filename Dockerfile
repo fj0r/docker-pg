@@ -23,6 +23,7 @@ ENV BUILD_CITUS_DEPS \
     libxslt-dev \
     libzstd-dev
 
+COPY jiebafull.patch /tmp/
 #ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
@@ -52,6 +53,18 @@ RUN set -eux \
   ; mkdir -p $build_dir \
   \
   ; cd $build_dir \
+  ; git clone https://github.com/jaiminpan/pg_jieba \
+  ; cd pg_jieba \
+  ; git apply /tmp/jiebafull.patch \
+  ; git submodule update --init --recursive  \
+  ; mkdir build \
+  ; cd build \
+  ; cmake .. \
+      -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/${PG_MAJOR}/server \
+  ; make \
+  ; make install \
+  \
+  ; cd $build_dir \
   ; citus_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/citusdata/citus/releases | jq -r '.[0].tag_name' | cut -c 2-) \
   ; curl -sSL https://github.com/citusdata/citus/archive/refs/tags/v${citus_version}.tar.gz | tar zxf - \
   ; cd citus-${citus_version} \
@@ -79,18 +92,6 @@ RUN set -eux \
   ; mkdir build && cd build \
   ; cmake .. \
   ; make && make install \
-  \
-  ; cd $build_dir \
-  ; git clone https://github.com/jaiminpan/pg_jieba \
-  ; cd pg_jieba \
-  ; sed -i jieba.cpp -e 's!QuerySegment!FullSegment!g' \
-  ; git submodule update --init --recursive  \
-  ; mkdir build \
-  ; cd build \
-  ; cmake .. \
-      -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/${PG_MAJOR}/server \
-  ; make \
-  ; make install \
   \
   ; cd $build_dir \
   ; timescaledb_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/timescale/timescaledb/releases | jq -r '.[0].tag_name') \

@@ -1,0 +1,146 @@
+diff --git a/jieba.cpp b/jieba.cpp
+index d7b71bb..e853964 100644
+--- a/jieba.cpp
++++ b/jieba.cpp
+@@ -33,6 +33,7 @@ struct JiebaCtx
+ 	// They share the same dict trie and model
+ 	MixSegment* mix_seg_;
+ 	QuerySegment* query_seg_;
++	FullSegment* full_seg_;
+ 	MPSegment* mp_seg_;
+ 	HMMSegment* hmm_seg_;
+ 
+@@ -56,6 +57,7 @@ Jieba_New(const char* dict_path, const char* model_path, const char* user_dict_p
+ 	ctx->hmm_model_ = new HMMModel(model_path);
+ 	ctx->mix_seg_ = new MixSegment(ctx->dict_trie_, ctx->hmm_model_);
+ 	ctx->query_seg_ = new QuerySegment(ctx->dict_trie_, ctx->hmm_model_);
++	ctx->full_seg_ = new FullSegment(ctx->dict_trie_);
+ 	ctx->mp_seg_ = new MPSegment(ctx->dict_trie_);
+ 	ctx->hmm_seg_ = new HMMSegment(ctx->hmm_model_);
+ 
+@@ -72,6 +74,7 @@ Jieba_Free(JiebaCtx* ctx)
+ {
+ 	delete ctx->mix_seg_;
+ 	delete ctx->query_seg_;
++	delete ctx->full_seg_;
+ 	delete ctx->mp_seg_;
+ 	delete ctx->hmm_seg_;
+ 
+@@ -102,6 +105,9 @@ Jieba_Cut(JiebaCtx* ctx, const char* str, int len, int mode)
+ 		case MODE_QRY:
+ 			x = (SegmentBase*) ctx->query_seg_;
+ 			break;
++		case MODE_FULL:
++			x = (SegmentBase*) ctx->full_seg_;
++			break;
+ 		default:
+ 			x = (SegmentBase*) ctx->mix_seg_;
+ 			break;
+diff --git a/jieba.h b/jieba.h
+index b8ef7ee..16d3577 100644
+--- a/jieba.h
++++ b/jieba.h
+@@ -32,6 +32,7 @@ typedef struct JiebaResult
+ #define MODE_HMM 2
+ #define MODE_MIX 3
+ #define MODE_QRY 4
++#define MODE_FULL 5
+ 
+ extern JiebaCtx* Jieba_New(const char* dict_path, const char* hmm_path, const char* user_dict);
+ extern void Jieba_Free(JiebaCtx* ctx);
+diff --git a/pg_jieba--unpackaged.sql b/pg_jieba--unpackaged.sql
+index 471961e..0767c59 100644
+--- a/pg_jieba--unpackaged.sql
++++ b/pg_jieba--unpackaged.sql
+@@ -3,6 +3,7 @@
+ 
+ ALTER EXTENSION jieba ADD FUNCTION jieba_start(internal,integer);
+ ALTER EXTENSION jieba ADD FUNCTION jieba_query_start(internal,integer);
++ALTER EXTENSION jieba ADD FUNCTION jieba_full_start(internal,integer);
+ ALTER EXTENSION jieba ADD FUNCTION jieba_mp_start(internal,integer);
+ ALTER EXTENSION jieba ADD FUNCTION jieba_hmm_start(internal,integer);
+ ALTER EXTENSION jieba ADD FUNCTION jieba_gettoken(internal,internal,internal);
+diff --git a/pg_jieba.c b/pg_jieba.c
+index b2dc740..b899e93 100644
+--- a/pg_jieba.c
++++ b/pg_jieba.c
+@@ -51,6 +51,9 @@ Datum jieba_start(PG_FUNCTION_ARGS);
+ PG_FUNCTION_INFO_V1(jieba_query_start);
+ Datum jieba_query_start(PG_FUNCTION_ARGS);
+ 
++PG_FUNCTION_INFO_V1(jieba_full_start);
++Datum jieba_full_start(PG_FUNCTION_ARGS);
++
+ PG_FUNCTION_INFO_V1(jieba_mp_start);
+ Datum jieba_mp_start(PG_FUNCTION_ARGS);
+ 
+@@ -156,6 +159,20 @@ jieba_query_start(PG_FUNCTION_ARGS)
+ 	PG_RETURN_POINTER(pst);
+ }
+ 
++Datum
++jieba_full_start(PG_FUNCTION_ARGS)
++{
++	ParserState* const pst = (ParserState *) palloc0(sizeof(ParserState));
++	pst->buffer = (char *) PG_GETARG_POINTER(0);
++	pst->len = PG_GETARG_INT32(1);
++
++	pst->ctx = jieba;
++
++	pst->stat = Jieba_Cut(pst->ctx, pst->buffer, pst->len, MODE_FULL);
++
++	PG_RETURN_POINTER(pst);
++}
++
+ Datum
+ jieba_mp_start(PG_FUNCTION_ARGS)
+ {
+diff --git a/pg_jieba.sql b/pg_jieba.sql
+index 0258e0c..0078d66 100644
+--- a/pg_jieba.sql
++++ b/pg_jieba.sql
+@@ -8,6 +8,11 @@ RETURNS internal
+ AS 'MODULE_PATHNAME'
+ LANGUAGE C STRICT;
+ 
++CREATE FUNCTION jieba_full_start(internal, integer)
++RETURNS internal
++AS 'MODULE_PATHNAME'
++LANGUAGE C STRICT;
++
+ CREATE FUNCTION jieba_mp_start(internal, integer)
+ RETURNS internal
+ AS 'MODULE_PATHNAME'
+@@ -49,6 +54,14 @@ CREATE TEXT SEARCH PARSER jiebaqry (
+ 	HEADLINE = pg_catalog.prsd_headline
+ );
+ 
++CREATE TEXT SEARCH PARSER jiebafull (
++	START    = jieba_full_start,
++	GETTOKEN = jieba_gettoken,
++	END      = jieba_end,
++	LEXTYPES = jieba_lextype,
++	HEADLINE = pg_catalog.prsd_headline
++);
++
+ CREATE TEXT SEARCH PARSER jiebamp (
+ 	START    = jieba_mp_start,
+ 	GETTOKEN = jieba_gettoken,
+@@ -68,6 +81,9 @@ CREATE TEXT SEARCH PARSER jiebahmm (
+ CREATE TEXT SEARCH CONFIGURATION jiebacfg (PARSER = jieba);
+ COMMENT ON TEXT SEARCH CONFIGURATION jiebacfg IS 'Mix segmentation configuration for jieba';
+ 
++CREATE TEXT SEARCH CONFIGURATION jiebafull (PARSER = jiebafull);
++COMMENT ON TEXT SEARCH CONFIGURATION jiebafull IS 'Full segmentation configuration for jieba';
++
+ CREATE TEXT SEARCH CONFIGURATION jiebaqry (PARSER = jiebaqry);
+ COMMENT ON TEXT SEARCH CONFIGURATION jiebaqry IS 'Query segmentation configuration for jieba';
+ 
+@@ -81,6 +97,7 @@ CREATE TEXT SEARCH DICTIONARY jieba_stem (TEMPLATE=simple, stopwords = 'jieba');
+ COMMENT ON TEXT SEARCH DICTIONARY jieba_stem IS 'jieba dictionary: lower case and check for stopword which including Unicode symbols that are mainly Chinese characters and punctuations';
+ 
+ ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
++ALTER TEXT SEARCH CONFIGURATION jiebafull ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
+ ALTER TEXT SEARCH CONFIGURATION jiebaqry ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
+ ALTER TEXT SEARCH CONFIGURATION jiebamp ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
+ ALTER TEXT SEARCH CONFIGURATION jiebahmm ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
