@@ -23,12 +23,21 @@ update xmh_shop.shop_goods set tsv = null;
 
 
 -- 同义词
--- select * from ts_debug('jiebacfg', '当一个词典配置文件第一次在数据库会话中使');
--- select ts_lexize('jieba_syn1', '男式');
-create text search dictionary jieba_syn (template = synonym, synonyms='jieba_synonym');
-alter text search dictionary jieba_syn (synonyms='jieba_synonym');
+select * from ts_debug('jiebacfg', '当一个词典配置文件第一次在数据库会话中使');
+select ts_lexize('jieba_syn', '男式');
+create text search dictionary jieba_syn (template = synonym, synonyms='synonym_sample');
+-- alter text search dictionary jieba_syn (synonyms='jieba_synonym');
 create text search configuration my_qry (copy = jiebaqry);
-alter text search configuration my_qry alter mapping for n with jieba_syn, jieba_stem;
+alter text search configuration my_qry alter mapping for eng,an,nz,n,v,a,i,e,l,x with jieba_syn,jieba_stem;
+
+create extension if not exists dict_xsyn;
+-- create text search dictionary jieba_syn (template = xsyn_template, rules='xsyn_sample', keeporig=false, MATCHSYNONYMS=true);
+-- 安装dict_xsyn扩展会用默认参数创建一个文本搜索模板xsyn_template以及一个基于它的词典xsyn
+ALTER TEXT SEARCH DICTIONARY xsyn (RULES='xsyn_sample', KEEPORIG=true, matchsynonyms=true);
+select ts_lexize('xsyn', 'sn');
+create text search configuration xqry (copy = jiebaqry);
+alter text search configuration xqry alter mapping for eng,an,nz,n,v,a,i,e,l,x with xsyn,jieba_stem;
+
 
 /*
 with ts as ( select to_tsquery('jiebaqry', 'hello') as q) select goods_name, keywords, tsv from ts, xmh_shop.shop_goods where tsv @@ ts.q order by tsv <=> ts.q limit 100 ;
