@@ -1,4 +1,4 @@
-FROM nnurphy/pg
+FROM nashv1/pg
 
 # https://github.com/postgis/docker-postgis/blob/master/13-3.1/Dockerfile
 ENV POSTGIS_MAJOR 3
