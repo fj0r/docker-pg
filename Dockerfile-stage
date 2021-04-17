@@ -1,4 +1,4 @@
-FROM nnurphy/pg
+FROM fj0rd/pg
 
 ENV BUILD_DEPS \
 	git \
