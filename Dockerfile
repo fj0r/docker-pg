@@ -71,14 +71,14 @@ RUN set -eux \
   ; ./configure \
   ; make && make install \
   \
-  ; cd $build_dir \
-  ; anonymizer_version=$(curl -sSL "https://gitlab.com/api/v4/projects/7709206/releases" | jq -r '.[0].name') \
-  ; curl -sSL https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${anonymizer_version}/postgresql_anonymizer-${anonymizer_version}.tar.gz \
-    | tar zxf - \
-  ; cd postgresql_anonymizer-${anonymizer_version} \
-  ; make extension \
-  ; make install \
-  \
+  #; cd $build_dir \
+  #; anonymizer_version=$(curl -sSL "https://gitlab.com/api/v4/projects/7709206/releases" | jq -r '.[0].name') \
+  #; curl -sSL https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${anonymizer_version}/postgresql_anonymizer-${anonymizer_version}.tar.gz \
+  #  | tar zxf - \
+  #; cd postgresql_anonymizer-${anonymizer_version} \
+  #; make extension \
+  #; make install \
+  #\
   ; cd $build_dir \
   ; rum_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
   ; curl -sSL https://github.com/postgrespro/rum/archive/${rum_version}.tar.gz | tar zxf - \
