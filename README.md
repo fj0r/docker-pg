@@ -34,10 +34,12 @@ This is an environment variable that is not Docker specific. Because the variabl
 
 # start
 ```bash
-docker run --name test-fts --rm \
+# 999 is uid of `postgres` in container. connecting to
+docker run --rm -u 999 \
+    --name pg-test \
     -p 5532:5432 \
     -e POSTGRES_PASSWORD=123456 \
     -e PGCONF_SHARED_BUFFERS=512MB \
     -v $PWD/user.dict:/usr/share/postgresql/12/tsearch_data/jieba_user.dict \
-    nnurphy/pg
+    fj0rd/pg
 ```
