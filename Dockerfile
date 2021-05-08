@@ -40,7 +40,7 @@ RUN set -eux \
       postgresql-${PG_MAJOR}-mysql-fdw \
       python3-pip python3-setuptools \
       libcurl4 curl jq ca-certificates \
-      uuid mariadb-client-core-10.5 \
+      uuid mariadb-client \
       ${BUILD_DEPS:-} \
       ${BUILD_CITUS_DEPS:-} \
   ; pip3 --no-cache-dir install \
