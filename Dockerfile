@@ -23,7 +23,6 @@ ENV BUILD_CITUS_DEPS \
     libxslt-dev \
     libzstd-dev
 
-COPY jiebafull.patch /tmp/
 #ENV LANG zh_CN.utf8
 ENV TIMEZONE=Asia/Shanghai
 RUN set -eux \
@@ -56,7 +55,6 @@ RUN set -eux \
   ; cd $build_dir \
   ; git clone https://github.com/jaiminpan/pg_jieba \
   ; cd pg_jieba \
-  ; git apply /tmp/jiebafull.patch \
   ; git submodule update --init --recursive  \
   ; mkdir build \
   ; cd build \
