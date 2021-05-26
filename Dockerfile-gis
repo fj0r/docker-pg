@@ -1,5 +1,4 @@
 FROM fj0rd/pg
-USER root
 
 # https://github.com/postgis/docker-postgis/blob/master/13-3.1/Dockerfile
 ENV POSTGIS_MAJOR 3
@@ -71,4 +70,3 @@ RUN set -ex \
  && rm -rf /var/lib/apt/lists/*
 
 # RUN rm /docker-entrypoint-initdb.d/10_postgis.sh
-USER postgres
