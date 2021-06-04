@@ -37,6 +37,17 @@ RUN set -eux \
       postgresql-plpython3-${PG_MAJOR} \
       postgresql-${PG_MAJOR}-wal2json \
       postgresql-${PG_MAJOR}-mysql-fdw \
+      postgresql-${PG_MAJOR}-rum \
+      postgresql-${PG_MAJOR}-similarity \
+      postgresql-${PG_MAJOR}-rational \
+      postgresql-${PG_MAJOR}-pllua \
+      postgresql-${PG_MAJOR}-cron \
+      postgresql-${PG_MAJOR}-extra-window-functions \
+      postgresql-${PG_MAJOR}-first-last-agg \
+      postgresql-${PG_MAJOR}-hll \
+      postgresql-${PG_MAJOR}-ip4r \
+      postgresql-${PG_MAJOR}-jsquery \
+      postgresql-${PG_MAJOR}-pgaudit \
       python3-pip python3-setuptools \
       libcurl4 curl jq ca-certificates \
       uuid mariadb-client \
@@ -78,12 +89,20 @@ RUN set -eux \
   #; make extension \
   #; make install \
   #\
+  \
   ; cd $build_dir \
-  ; rum_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
-  ; curl -sSL https://github.com/postgrespro/rum/archive/${rum_version}.tar.gz | tar zxf - \
-  ; cd rum-${rum_version} \
-  ; make USE_PGXS=1 \
-  ; make USE_PGXS=1 install \
+  ; zson_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/zson/releases | jq -r '.[0].tag_name' | cut -c 2-) \
+  ; curl -sSL https://github.com/postgrespro/zson/archive/refs/tags/v${zson_version}.tar.gz | tar zxf - \
+  ; cd zson-${zson_version} \
+  ; make && make install \
+  \
+  #### via apt
+  # ; cd $build_dir \
+  # ; rum_version=$(curl -sSL -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/postgrespro/rum/releases | jq -r '.[0].tag_name') \
+  # ; curl -sSL https://github.com/postgrespro/rum/archive/${rum_version}.tar.gz | tar zxf - \
+  # ; cd rum-${rum_version} \
+  # ; make USE_PGXS=1 \
+  # ; make USE_PGXS=1 install \
   \
   ; cd $build_dir \
   ; git clone https://github.com/adjust/clickhouse_fdw.git \
